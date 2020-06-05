@@ -5,12 +5,27 @@ import ReactDOM from "react-dom";
 import { Canvas, useFrame } from "react-three-fiber";
 import './main.css';
 
+function updatePosition(particle){
+  let newPos = new THREE.Vector3(particle.x,particle.y, particle.z); 
+  newPos.add(new THREE.Vector3(0.5-Math.random(),0.5-Math.random(),0.5-Math.random()));
 
+  if((particle.x*particle.x)+(particle.y*particle.y)+(particle.z*particle.z)>300 ){
+    
+    particle.velocity.x =-particle.velocity.x;
+    particle.velocity.y -=particle.velocity.y;
+    particle.velocity.z -=particle.velocity.z;
+    
+  }  
+  particle.x = newPos.x+particle.velocity.x;
+  particle.y = newPos.y+particle.velocity.y;
+  particle.z = newPos.z+particle.velocity.z;
+ 
+}
 const count = 60;
 const Boxes =()=>{
   const meshRef = React.useRef();
   
-   const scrathedObj3d = React.useMemo(()=>{
+  const scrathedObj3d = React.useMemo(()=>{
     return new THREE.Object3D();
   },[]);
 
@@ -20,7 +35,9 @@ const Boxes =()=>{
       tmp.push({
         x: Math.random()*10,
         y: Math.random()*10,
-        z:0
+        z:Math.random()*10,
+        velocity:new THREE.Vector3(0.5-Math.random(),0.5-Math.random(),0.5-Math.random())
+
       })
     }
     return tmp;
@@ -28,8 +45,10 @@ const Boxes =()=>{
 
   useFrame(()=>{
     const mesh = meshRef.current;
-    particles.forEach((particle,i)=>{
 
+
+    particles.forEach((particle,i)=>{
+      updatePosition(particle);
       scrathedObj3d.position.set(particle.x,particle.y,particle.z);
       scrathedObj3d.rotation.set(Math.PI/2,0,0);
       scrathedObj3d.updateMatrix();
